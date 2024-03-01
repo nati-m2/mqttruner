@@ -1,0 +1,16 @@
+{
+  "0F": "enter",
+  "10": "win" ,
+  "0D": "left",
+  "0E": "right",
+  "0B": "up",
+  "0C": "down",
+  "03": "volumeup",
+  "04": "volumedown",
+  "12": "backspace",
+  "09": "playpause",
+  "0A": "stop",
+  "05": "nexttrack",
+  "06": "prevtrack",
+  "07": "loopPress"
+}
