@@ -44,7 +44,7 @@ def open_url(url):
 
 
 # ignoreMsg
-def ignoreMsg(msg):
+def ignoreMsg(msg, config):
     for m in config['ignoreMsg']:
         if m == msg:
             return True
@@ -61,41 +61,53 @@ def click(x, y):
         pyautogui.click(x, y)
 
 
-def getMapKeys(payload):
-    print(payload)
+def getMapKeys(payload, mapKeys):
     if payload in mapKeys:
         return mapKeys[payload]
     else:
         return
 
 
+def runJob(topic, payload, config, mapKeys):
+    if ignoreMsg(payload, config):
+        return
+    if topic == config['topics'][config['rTopic']]:
+        payload = getMapKeys(payload, mapKeys)
+        press(payload)
+        return
+    else:
+        payload = parse_data(payload)
+        if payload['type'] == "exec":
+            exec(payload['cmd'])
+            return
+        if payload['type'] == "url":
+            open_url(payload['cmd'])
+            return
+        if payload['type'] == "press":
+            press(payload['cmd'])
+            return
+        if payload['type'] == "click":
+            click(payload['cmd'][0], payload['cmd'][1])
+            return
+        if payload['type'] == "disconnect":
+            disconnect()
+
+
+def loopPress(payload, config):
+    while startLoopPress:
+        pyautogui.press(payload)
+        sleep(config['loopPressDelay'] / 1000)
+
+
 # The callback for when a PUBLISH message is received from the server.
 def on_message(mqttc, userdata, msg):
     error_log_report(msg.topic, msg.payload)
-    msg.payload = msg.payload.decode()
-    if ignoreMsg(msg.payload):
-        return
-    if msg.topic == config['topics'][config['rTopic']]:
-        msg.payload = getMapKeys(msg.payload)
-        press(msg.payload)
-    else:
-        payload = parse_data(msg.payload)
-        if payload['type'] == "exec":
-            exec(payload['cmd'])
-        elif payload['type'] == "url":
-            open_url(payload['cmd'])
-        elif payload['type'] == "press":
-            press(payload['cmd'])
-        elif payload['type'] == "click":
-            click(payload['cmd'][0], payload['cmd'][1])
-        elif payload['type'] == "disconnect":
-            disconnect()
+    p = multiprocessing.Process(target=runJob, args=[msg.topic, msg.payload.decode(), config, mapKeys])
+    p.start()
 
 
 def on_connect(client, userdata, flags, reason_code, properties):
     print(f"Connected with result code {reason_code}")
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
     for topic in config['topics']:
         client.subscribe(topic)
 
@@ -104,7 +116,6 @@ if __name__ == "__main__":
     global config
     global mapKeys
     global startLoopPress
-    startLoopPress = 0
     config = parse_data(open("mqttrunerConfig.json", "r").read())
     mapKeys = parse_data(open("mapKeys.json", "r").read())
     multiprocessing.freeze_support()
