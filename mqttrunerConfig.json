@@ -1,12 +1,18 @@
 {
   "username": "mqtt-user",
   "password": "Nm57932201234",
-  "addr" : "192.168.0.4",
-  "ignoreMsg": ["66ff00ff+289C6E83429C,192.168.0.54"],
-  "topics" : ["pc","289C6E83429C/up"],
-  "rTopic" : 1,
-  "debug" : false,
+  "addr": "192.168.0.4",
   "loopPressDelay": 500,
   "keepalive" : 60,
-  "port": 1883
+  "port": 1883,
+  "debug": false,
+  "ignoreMsg": ["66ff00ff+289C6E83429C,192.168.0.54"],
+  "eventPullInterval": 10,
+  "topics": {
+    "pc": "pc",
+    "eventLog": "event_log",
+    "status": "status_topic",
+    "auth": "auth_topic",
+    "error": "error_topic"
+  }
 }
