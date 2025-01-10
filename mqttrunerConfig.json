@@ -1,12 +1,16 @@
 {
   "username": "mqtt-user",
   "password": "1234",
-  "addr" : "192.168.0.4",
-  "ignoreMsg": [""],
-  "topics" : ["pc"],
-  "rTopic" : 1,
-  "debug" : false,
+  "addr": "0.0.0.0",
   "loopPressDelay": 500,
   "keepalive" : 60,
-  "port": 1883
+  "port": 1883,
+  "debug": false,
+  "ignoreMsg": [""],
+  "eventPullInterval": 10,
+  "topics": {
+    "pc": "pc",
+    "eventLog": "event_log",
+    "error": "error_topic"
+  }
 }
